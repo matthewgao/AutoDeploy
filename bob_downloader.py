@@ -47,26 +47,32 @@ class BobDownloader(object):
         print(self.final_path)
 
     def start(self):
-        if self._check():
+        if self._check_exist() or !self._check_valid():
             return
 
         try:
             print("Start downloading: {0}".format(self.file_name))
             local_filename, headers = urllib.request.urlretrieve(self.final_path, 
                             filename=self.file_name, reporthook=self._progress_hook)
-            print("Finish: {0}".format(self.file_name))
+            print("\nFinish: {0}".format(self.file_name))
             print("Start downloading: {0}".format(self.md5_file_name))
             local_filename, headers = urllib.request.urlretrieve(self.final_path, 
                             filename=self.md5_file_name, reporthook=self._progress_hook)
-            print("Finish: {0}".format(self.md5_file_name))
+            print("\nFinish: {0}".format(self.md5_file_name))
         except urllib.error.HTTPError as e:
             print(e.code)
             print(e.read())
 
-    def _check(self):
+    def _check_exist(self):
         if os.path.exists(self.file_name) and os.path.exists(self.md5_file_name) and self._md5_check():
             print("{0} existed, skip downloading".format(self.file_name))
             return True
+        return False
+
+    def _check_valid(self):
+        if self.branch in self._branch_map.keys():
+            return True
+        print("{0} is invalid branch".format(self.branch))
         return False
 
     def _md5_check(self): return True
@@ -75,7 +81,6 @@ class BobDownloader(object):
         percent = (block * block_size)*100 / total_size
         sys.stdout.write('\b\b\b\b\b\b')
         sys.stdout.write('%.2f%%' % percent)
-        # print(percent, block_size, total_size)
         sys.stdout.flush()
 
 
@@ -83,6 +88,8 @@ def run():
     b = BobDownloader('10.7.3','217')
     b.start()
 
+def usage():
+    pass
 
 if __name__ == '__main__':
     run()
