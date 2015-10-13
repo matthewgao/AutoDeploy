@@ -77,12 +77,14 @@ class CommandRunner(object):
 		_path = BASE_PATH + BRANCH_MAP[ver_str][1] + '/vm-imaging/'
 		os.chdir(_path)
 		#print(os.getcwd())
-		shell_str = './make-machine.sh -n {0} -i {1} -h {2}'.format(
-							self.appl_name + '-' + self.internal_ip.replace('.','-'), 
-		 					_full_iso_path, self.internal_ip)
+		appliance_name = self.appl_name.replace('.','-') + '-' + self.internal_ip.replace('.','-')
+
+		shell_str = './make-machine.sh -n {0} -i {1} -h {2}'.format(appliance_name, 
+		 								_full_iso_path, self.internal_ip)
 		print(shell_str)
 		os.system(shell_str)
-		print("ALL DONE")
+		print("ALL DONE, VM name is {0}".format(appliance_name))
+		print("You can access AMC through : https://{0}:8443".format(self.internal_ip))
 	
 
 def usage():
