@@ -77,7 +77,10 @@ class CommandRunner(object):
 		_path = BASE_PATH + BRANCH_MAP[ver_str][1] + '/vm-imaging/'
 		os.chdir(_path)
 		#print(os.getcwd())
-		appliance_name = self.appl_name.replace('.','-') + '-' + self.internal_ip.replace('.','-')
+		# appliance_name = self.appl_name.replace('.','-') + '-' + self.internal_ip.split('.')[-1]
+		appliance_name = self.appl_name.replace('.','-')
+		print('Appliance name: {0}'.format(appliance_name))
+
 
 		shell_str = './make-machine.sh -n {0} -i {1} -h {2}'.format(appliance_name, 
 		 								_full_iso_path, self.internal_ip)

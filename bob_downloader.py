@@ -18,7 +18,7 @@ BRANCH_MAP = {
                '11.4.0' : ['kanga-tip','kanga'],
                '10.7.3' : ['jaytip','jay'],
                '10.7.2' : ['10.7.2','jay'],
-               '10.7.2' : ['10.7.1','jay'],
+               '10.7.1' : ['10.7.1','jay'],
                '10.7.0' : ['10.7.0','jay']
                # '10.6.6' : ['indextip', 'index'],
                # '10.6.5' : ['10.6.5','index'],
@@ -31,6 +31,7 @@ BRANCH_MAP = {
 class BobDownloader(object):
     """docstring for BobDownloader"""
     _base_path = 'http://10.4.16.60/nas-bob/daily/appliance/daily/ex-{0}-appliance/{1}-{2}/{1}-{2}.iso'
+    _base_md5_path = 'http://10.4.16.60/nas-bob/daily/appliance/daily/ex-{0}-appliance/{1}-{2}/{1}-{2}.iso'
     
 
 
@@ -39,14 +40,22 @@ class BobDownloader(object):
         self._image_dir = _image_dir
         self.branch = branch
         self.build = build
-        self.file_name = '{0}.{1}.iso'.format(self.branch, self.build)
-        self.md5_file_name = '{0}.{1}.iso.md5'.format(self.branch, self.build)
-        
+        self.file_name = '{0}-{1}.iso'.format(self.branch, self.build)
+        self.md5_file_name = '{0}-{1}.iso.md5'.format(self.branch, self.build)
+
+        print('build is {0}'.format(self.build))
+        if self.build.startswith('auto'):
+            self._base_path = self._base_path.replace('daily', 'continuous')
+            self._base_md5_path = self._base_md5_path.replace('daily', 'continuous')
+
         if '10' in self.branch:
             self.file_name = 'unstripped-' + self.file_name
             self.md5_file_name = 'unstripped-' + self.md5_file_name
         
         self.final_path = self._base_path.format(BRANCH_MAP[self.branch][0], 
+                                            self.branch, self.build)
+
+        self.final_md5_path = self._base_md5_path.format(BRANCH_MAP[self.branch][0], 
                                             self.branch, self.build)
 
         if (self._image_dir is not None and 
@@ -66,16 +75,20 @@ class BobDownloader(object):
 
         try:
             print("Start downloading: {0}".format(self.file_name))
+            print("Url: {0}".format(self.final_path))
             local_filename, headers = urllib.request.urlretrieve(self.final_path, 
                             filename=self._full_path_file_name, reporthook=self._progress_hook)
             print("\nFinish: {0}".format(self.file_name))
+            
             print("Start downloading: {0}".format(self.md5_file_name))
-            local_filename, headers = urllib.request.urlretrieve(self.final_path, 
+            local_filename, headers = urllib.request.urlretrieve(self.final_md5_path, 
                             filename=self._full_path_md5_file_name, reporthook=self._progress_hook)
+            
             print("\nFinish: {0}".format(self.md5_file_name))
         except urllib.error.HTTPError as e:
             print(e.code)
             print(e.read())
+            exit()
 
         return self._full_path_file_name
 
