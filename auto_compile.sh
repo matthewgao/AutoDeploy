@@ -19,7 +19,7 @@ error() {
 }
 
 msg "start to sync the code from p4" 
-p4 -u shgao -P Gs198664 sync //depot/Firmware/EXSeriesVPN/kanga/tip/src/avt/authentication-api/pytest/...#head
+p4 -u shgao -P password sync //depot/Firmware/EXSeriesVPN/kanga/tip/src/avt/authentication-api/pytest/...#head
 ret="$?"
 success "sync code done"
 
